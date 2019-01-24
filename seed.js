@@ -1,6 +1,5 @@
 process.env.NODE_ENV = "dev"
 module.exports = {
-	"dev": "localhost/petes-pets",
-	"price": 10
+	"dev": "localhost/petes-pets"
 	// "prod": "localhost/PROD_DB_NAME"
 }

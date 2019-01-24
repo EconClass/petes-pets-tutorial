@@ -1,5 +1,16 @@
 // MODELS
 const Pet = require('../models/pet');
+const nodemailer = require('nodemailer');
+const mg = require('nodemailer-mailgun-transport');
+
+const auth = {
+  auth: {
+    api_key: process.env.MAILGUN_API_KEY,
+    domain: process.env.EMAIL_DOMAIN
+  }
+}
+
+const nodemailerMailgun = nodemailer.createTransport(mg(auth));
 
 // UPLOADING TO AWS S3
 const multer  = require('multer');
@@ -90,7 +101,7 @@ module.exports = (app) => {
     console.log(req.body);
     // Set your secret key: remember to change this to your live secret key in production
     // See your keys here: https://dashboard.stripe.com/account/apikeys
-    var stripe = require("stripe")(process.env.PRIVATE_STRIPE_API_KEY);
+    var stripe = require("stripe")("sk_test_Loz6xPRc7Tl8c6OCkyZMAEkE");
 
     // Token is created using Checkout or Elements!
     // Get the payment token ID submitted by the form:
@@ -103,12 +114,34 @@ module.exports = (app) => {
         description: `Purchased ${pet.name}, ${pet.species}`,
         source: token,
       }).then((chg) => {
-        res.redirect(`/pets/${req.params.id}`);
+      // Convert the amount back to dollars for ease in displaying in the template
+        const user = {
+          email: req.body.stripeEmail,
+          amount: chg.amount / 100,
+          petName: pet.name
+        };
+        // After we get the pet so we can grab it's name, then we send the email
+        nodemailerMailgun.sendMail({
+          from: 'no-reply@example.com',
+          to: user.email, // An array if you have multiple recipients.
+          subject: 'Pet Purchased!',
+          template: {
+            name: 'email.handlebars',
+            engine: 'handlebars',
+            context: user
+          }
+        }).then(info => {
+          console.log('Response: ' + info);
+          res.redirect(`/pets/${req.params.id}`);
+        }).catch(err => {
+          console.log('Error: ' + err);
+          res.redirect(`/pets/${req.params.id}`);
         });
       })
-      .catch(err => {
-        console.log('Error: ' + err);
-      });
+        .catch(err => {
+          console.log('Error: ' + err);
+        });
+    })
   });
 
   // EDIT PET

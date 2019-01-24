@@ -9,7 +9,9 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const methodOverride = require('method-override')
+const methodOverride = require('method-override');
+const nodemailer = require('nodemailer');
+const mg = require('nodemailer-mailgun-transport');
 
 const app = express();
 

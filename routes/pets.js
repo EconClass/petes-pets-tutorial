@@ -95,6 +95,7 @@ module.exports = (app) => {
   // SHOW PET
   app.get('/pets/:id', (req, res) => {
     Pet.findById(req.params.id).exec((err, pet) => {
+      console.log(pet)
       res.render('pets-show', { pet: pet });
     });
   });
@@ -137,13 +138,12 @@ module.exports = (app) => {
           console.log('Response: ' + info);
           res.redirect(`/pets/${req.params.id}`);
         }).catch(err => {
-          console.log('Error: ' + err);
+          console.log('Error in Mailgun: ' + err.message);
           res.redirect(`/pets/${req.params.id}`);
         });
-      })
-        .catch(err => {
-          console.log('Error: ' + err);
-        });
+      }).catch(err => {
+        console.log('Error in Stripe: ' + err.message);
+      });
     });
   });
 

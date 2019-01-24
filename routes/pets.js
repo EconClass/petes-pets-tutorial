@@ -70,16 +70,16 @@ module.exports = (app) => {
 
   // CREATE PET
   app.post('/pets', upload.single('avatar'), (req, res, next) => {
-    var pet = new Pet(req.body);
+    let pet = new Pet(req.body);
     pet.save(function (err) {
       if (req.file) {
         client.upload(req.file.path, {}, function (err, versions, meta) {
           if (err) { return res.status(400).send({ err: err }) };
 
           versions.forEach(function (image) {
-            var urlArray = image.url.split('-');
+            let urlArray = image.url.split('-');
             urlArray.pop();
-            var url = urlArray.join('-');
+            let url = urlArray.join('-');
             pet.avatarUrl = url;
             pet.save();
           });
@@ -104,15 +104,15 @@ module.exports = (app) => {
     console.log(req.body);
     // Set your secret key: remember to change this to your live secret key in production
     // See your keys here: https://dashboard.stripe.com/account/apikeys
-    var stripe = require("stripe")("sk_test_Loz6xPRc7Tl8c6OCkyZMAEkE");
+    let stripe = require("stripe")(String(process.env.PRIVATE_STRIPE_API_KEY));
 
     // Token is created using Checkout or Elements!
     // Get the payment token ID submitted by the form:
     const token = req.body.stripeToken; // Using Express
 
     Pet.findById(req.body.petId).exec((err, pet) => {
-      const charge = stripe.charges.create({
-        amount: pet.price * 100,
+      stripe.charges.create({
+        amount: Math.round( pet.price * 100 ),
         currency: 'usd',
         description: `Purchased ${pet.name}, ${pet.species}`,
         source: token,
@@ -144,7 +144,7 @@ module.exports = (app) => {
         .catch(err => {
           console.log('Error: ' + err);
         });
-    })
+    });
   });
 
   // EDIT PET

@@ -102,7 +102,7 @@ module.exports = (app) => {
     console.log(req.body);
     // Set your secret key: remember to change this to your live secret key in production
     // See your keys here: https://dashboard.stripe.com/account/apikeys
-    var stripe = require("stripe")("sk_test_Loz6xPRc7Tl8c6OCkyZMAEkE");
+    var stripe = require("stripe")(process.env.PRIVATE_STRIPE_API_KEY);
 
     // Token is created using Checkout or Elements!
     // Get the payment token ID submitted by the form:
@@ -122,6 +122,7 @@ module.exports = (app) => {
           petName: pet.name
         };
         // After we get the pet so we can grab it's name, then we send the email
+        console.log(user.email)
         nodemailerMailgun.sendMail({
           from: 'no-reply@example.com',
           to: user.email, // An array if you have multiple recipients.

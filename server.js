@@ -16,7 +16,7 @@ const mg = require('nodemailer-mailgun-transport');
 const app = express();
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/petes-pets');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/petes-pets');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
